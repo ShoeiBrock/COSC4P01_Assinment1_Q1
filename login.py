@@ -28,23 +28,27 @@ class Login:
             info.close()
 
     def signup_information(self, username, password):
-        if os.path.isfile(self.info_path):
-            info = open(self.info_path, 'a')
-        else:
-            info = open(self.info_path, 'w')
+
+
+        message = None
         # Write new username and hashed password in login_info.txt
         if username == '' or password == '':
-            info.close()
-            return 'Neither username nor password is entered.'
-        if username in self.usernames:
-            info.close()
-            return 'This username is already in use.'
+            message = 'Neither username nor password is entered.'
+        elif username in self.usernames:
+            message = 'This username is already in use.'
         else:
             line = username + ' ' + str(sha256(password.encode()).digest()) + ' 0\n'
+
+            if os.path.isfile(self.info_path):
+                info = open(self.info_path, 'a')
+            else:
+                info = open(self.info_path, 'w')
             info.write(line)
             info.close()
             self.read_information()
-            return 'Your account are created successfully.'
+            message = 'Your account are created successfully.'
+
+        return message
 
     def validate_password(self, username, password):
         # Check if username is stored in login_info.txt
@@ -87,29 +91,3 @@ class Login:
             self.usernames = []
             self.hashed_passwords = []
             self.failure_nums = []
-
-
-if __name__ == '__main__':
-    Login = Login()
-    Login.is_login = False
-    while not Login.is_login:
-        print('Enter \"Log in\", \"Sign up\", or \"Quit\" to quit.')
-        operation = input()
-
-        if operation == 'Log in':
-            print('Enter username')
-            username = input()
-            print('Enter password')
-            password = input()
-            print(Login.validate_password(username, password))
-        elif operation == 'Sign up':
-            print('Enter username')
-            username = input()
-            print('Enter password')
-            password = input()
-            print(Login.signup_information(username, password))
-        elif operation == 'Quit':
-            Login.update_info()
-            break
-        else:
-            print('You entered an invalid option.')
